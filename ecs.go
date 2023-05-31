@@ -41,8 +41,30 @@ func New() *ECS {
 	}
 }
 
-func Init[T any](e *ECS, set *sparseset.Set[T]) {
-	e.pools[getTypeId[T]()] = unsafe.Pointer(set)
+func Init[T any](e *ECS) *sparseset.Set[T] {
+	if p, ok := GetPool[T](e); ok {
+		return p
+	}
+
+	var t *T
+	elemType := reflect.TypeOf(t)
+	method, ok := elemType.MethodByName("Destroy")
+
+	var pool *sparseset.Set[T]
+	if ok {
+		options := sparseset.Options[T]{
+			func(value *T) {
+				method.Func.Call([]reflect.Value{reflect.ValueOf(value)})
+			},
+		}
+
+		pool = sparseset.NewWithOptions[T](e.defaultPageSize, e.nullKey, options)
+	} else {
+		pool = sparseset.New[T](e.defaultPageSize, e.nullKey)
+	}
+
+	e.pools[getTypeId[T]()] = unsafe.Pointer(pool)
+	return pool
 }
 
 func Add[T any](e *ECS, entityId int) *T {
