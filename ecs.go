@@ -98,6 +98,39 @@ func Get[T any](e *ECS, entityId int) (*T, bool) {
 	return (*sparseset.Set[T])(set).Get(entityId)
 }
 
+func Get2[A, B any](e *ECS, entityId int) (*A, *B, bool) {
+	set1, ok := e.pools[getTypeId[A]()]
+	if !ok {
+		return nil, nil, false
+	}
+
+	set2, ok := e.pools[getTypeId[B]()]
+	if !ok {
+		return nil, nil, false
+	}
+
+	return sparseset.Lookup(entityId, (*sparseset.Set[A])(set1), (*sparseset.Set[B])(set2))
+}
+
+func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
+	set1, ok := e.pools[getTypeId[A]()]
+	if !ok {
+		return nil, nil, nil, false
+	}
+
+	set2, ok := e.pools[getTypeId[B]()]
+	if !ok {
+		return nil, nil, nil, false
+	}
+
+	set3, ok := e.pools[getTypeId[C]()]
+	if !ok {
+		return nil, nil, nil, false
+	}
+
+	return sparseset.Lookup3(entityId, (*sparseset.Set[A])(set1), (*sparseset.Set[B])(set2), (*sparseset.Set[C])(set3))
+}
+
 func GetPool[T any](e *ECS) (*sparseset.Set[T], bool) {
 	set, ok := e.pools[getTypeId[T]()]
 	if !ok {
@@ -147,4 +180,28 @@ func Join3[A, B, C any](e *ECS) *sparseset.Join3Iterator[A, B, C] {
 	}
 
 	return sparseset.Join3((*sparseset.Set[A])(a), (*sparseset.Set[B])(b), (*sparseset.Set[C])(c))
+}
+
+func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
+	a, ok := e.pools[getTypeId[A]()]
+	if !ok {
+		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
+	}
+
+	b, ok := e.pools[getTypeId[B]()]
+	if !ok {
+		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
+	}
+
+	c, ok := e.pools[getTypeId[C]()]
+	if !ok {
+		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
+	}
+
+	d, ok := e.pools[getTypeId[D]()]
+	if !ok {
+		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
+	}
+
+	return sparseset.Join4((*sparseset.Set[A])(a), (*sparseset.Set[B])(b), (*sparseset.Set[C])(c), (*sparseset.Set[D])(d))
 }
