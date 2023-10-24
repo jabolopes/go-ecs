@@ -262,7 +262,7 @@ func JoinOne[A, B any](e *ECS) (int, *A, *B, bool) {
 	return entityId, a, b, ok
 }
 
-func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) bool) {
+func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) int) {
 	set, ok := getPool[T](e)
 	if !ok {
 		return
