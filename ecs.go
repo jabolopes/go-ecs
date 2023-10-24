@@ -79,16 +79,6 @@ func Add[T any](e *ECS, entityId int) *T {
 	return (*sparseset.Set[T])(set).Add(entityId)
 }
 
-func Remove[T any](e *ECS, entityId int) {
-	typeId := getTypeId[T]()
-	set, ok := e.pools[typeId]
-	if !ok {
-		return
-	}
-
-	(*sparseset.Set[T])(set).Remove(entityId)
-}
-
 func Get[T any](e *ECS, entityId int) (*T, bool) {
 	set, ok := e.pools[getTypeId[T]()]
 	if !ok {
@@ -129,6 +119,16 @@ func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
 	}
 
 	return sparseset.Lookup3(entityId, (*sparseset.Set[A])(set1), (*sparseset.Set[B])(set2), (*sparseset.Set[C])(set3))
+}
+
+func Remove[T any](e *ECS, entityId int) {
+	typeId := getTypeId[T]()
+	set, ok := e.pools[typeId]
+	if !ok {
+		return
+	}
+
+	(*sparseset.Set[T])(set).Remove(entityId)
 }
 
 func GetPool[T any](e *ECS) (*sparseset.Set[T], bool) {
