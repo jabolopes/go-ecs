@@ -190,7 +190,7 @@ func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
 	*set3.Add(entityId) = c
 }
 
-func Remove[T any](e *ECS, entityId int) {
+func Unset[T any](e *ECS, entityId int) {
 	set, ok := getPool[T](e)
 	if !ok {
 		return
