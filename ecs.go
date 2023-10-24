@@ -91,16 +91,12 @@ func Init[T any](e *ECS) *sparseset.Set[T] {
 
 // TODO: Use 'Set' instead.
 func Add[T any](e *ECS, entityId int) *T {
-	typeId := getTypeId[T]()
-	set, ok := e.pools[typeId]
+	set, ok := getPool[T](e)
 	if !ok {
-		set := sparseset.New[T](e.defaultPageSize, e.nullKey)
-		e.pools[typeId] = unsafe.Pointer(set)
-		e.removers = append(e.removers, set)
-		return set.Add(entityId)
+		set = Init[T](e)
 	}
 
-	return (*sparseset.Set[T])(set).Add(entityId)
+	return set.Add(entityId)
 }
 
 func Get[T any](e *ECS, entityId int) (*T, bool) {
