@@ -36,6 +36,7 @@ type ECS struct {
 	nullKey         int
 	pools           map[int]unsafe.Pointer
 	removers        []remover
+	idGenerator     int
 }
 
 func getPool[T any](e *ECS) (*sparseset.Set[T], bool) {
@@ -74,6 +75,12 @@ func initPool[T any](e *ECS) *sparseset.Set[T] {
 	return pool
 }
 
+func (e *ECS) Add() int {
+	id := e.idGenerator
+	e.idGenerator++
+	return id
+}
+
 func (e *ECS) Remove(entityId int) {
 	for _, remover := range e.removers {
 		remover.Remove(entityId)
@@ -86,6 +93,7 @@ func New() *ECS {
 		1 << 20,                  /* nullKey */
 		map[int]unsafe.Pointer{}, /* pools */
 		nil,                      /* removers */
+		0,                        /* idGenerator */
 	}
 }
 
