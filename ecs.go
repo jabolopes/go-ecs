@@ -130,6 +130,51 @@ func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
 	return sparseset.Lookup3(entityId, set1, set2, set3)
 }
 
+func Set[A any](e *ECS, entityId int, a A) {
+	set, ok := getPool[A](e)
+	if !ok {
+		set = Init[A](e)
+	}
+
+	*set.Add(entityId) = a
+}
+
+func Set2[A, B any](e *ECS, entityId int, a A, b B) {
+	set1, ok := getPool[A](e)
+	if !ok {
+		set1 = Init[A](e)
+	}
+
+	set2, ok := getPool[B](e)
+	if !ok {
+		set2 = Init[B](e)
+	}
+
+	*set1.Add(entityId) = a
+	*set2.Add(entityId) = b
+}
+
+func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
+	set1, ok := getPool[A](e)
+	if !ok {
+		set1 = Init[A](e)
+	}
+
+	set2, ok := getPool[B](e)
+	if !ok {
+		set2 = Init[B](e)
+	}
+
+	set3, ok := getPool[C](e)
+	if !ok {
+		set3 = Init[C](e)
+	}
+
+	*set1.Add(entityId) = a
+	*set2.Add(entityId) = b
+	*set3.Add(entityId) = c
+}
+
 func Remove[T any](e *ECS, entityId int) {
 	set, ok := getPool[T](e)
 	if !ok {
