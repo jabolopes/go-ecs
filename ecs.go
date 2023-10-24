@@ -26,11 +26,16 @@ func getTypeId[T any]() int {
 	return typeId
 }
 
+type remover interface {
+	Remove(int)
+}
+
 // TODO: Replace pools map with array.
 type ECS struct {
 	defaultPageSize int
 	nullKey         int
 	pools           map[int]unsafe.Pointer
+	removers        []remover
 }
 
 func getPool[T any](e *ECS) (*sparseset.Set[T], bool) {
@@ -42,11 +47,18 @@ func getPool[T any](e *ECS) (*sparseset.Set[T], bool) {
 	return (*sparseset.Set[T])(set), true
 }
 
+func (e *ECS) Remove(entityId int) {
+	for _, remover := range e.removers {
+		remover.Remove(entityId)
+	}
+}
+
 func New() *ECS {
 	return &ECS{
 		4096,                     /* defaultPageSize */
 		1 << 20,                  /* nullKey */
 		map[int]unsafe.Pointer{}, /* pools */
+		nil,                      /* removers */
 	}
 }
 
@@ -73,6 +85,7 @@ func Init[T any](e *ECS) *sparseset.Set[T] {
 	}
 
 	e.pools[getTypeId[T]()] = unsafe.Pointer(pool)
+	e.removers = append(e.removers, pool)
 	return pool
 }
 
@@ -83,6 +96,7 @@ func Add[T any](e *ECS, entityId int) *T {
 	if !ok {
 		set := sparseset.New[T](e.defaultPageSize, e.nullKey)
 		e.pools[typeId] = unsafe.Pointer(set)
+		e.removers = append(e.removers, set)
 		return set.Add(entityId)
 	}
 
