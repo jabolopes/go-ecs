@@ -47,22 +47,7 @@ func getPool[T any](e *ECS) (*sparseset.Set[T], bool) {
 	return (*sparseset.Set[T])(set), true
 }
 
-func (e *ECS) Remove(entityId int) {
-	for _, remover := range e.removers {
-		remover.Remove(entityId)
-	}
-}
-
-func New() *ECS {
-	return &ECS{
-		4096,                     /* defaultPageSize */
-		1 << 20,                  /* nullKey */
-		map[int]unsafe.Pointer{}, /* pools */
-		nil,                      /* removers */
-	}
-}
-
-func Init[T any](e *ECS) *sparseset.Set[T] {
+func initPool[T any](e *ECS) *sparseset.Set[T] {
 	if p, ok := getPool[T](e); ok {
 		return p
 	}
@@ -89,14 +74,24 @@ func Init[T any](e *ECS) *sparseset.Set[T] {
 	return pool
 }
 
+func (e *ECS) Remove(entityId int) {
+	for _, remover := range e.removers {
+		remover.Remove(entityId)
+	}
+}
+
+func New() *ECS {
+	return &ECS{
+		4096,                     /* defaultPageSize */
+		1 << 20,                  /* nullKey */
+		map[int]unsafe.Pointer{}, /* pools */
+		nil,                      /* removers */
+	}
+}
+
 // TODO: Use 'Set' instead.
 func Add[T any](e *ECS, entityId int) *T {
-	set, ok := getPool[T](e)
-	if !ok {
-		set = Init[T](e)
-	}
-
-	return set.Add(entityId)
+	return initPool[T](e).Add(entityId)
 }
 
 func Get[T any](e *ECS, entityId int) (*T, bool) {
@@ -142,44 +137,21 @@ func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
 }
 
 func Set[A any](e *ECS, entityId int, a A) {
-	set, ok := getPool[A](e)
-	if !ok {
-		set = Init[A](e)
-	}
-
-	*set.Add(entityId) = a
+	*initPool[A](e).Add(entityId) = a
 }
 
 func Set2[A, B any](e *ECS, entityId int, a A, b B) {
-	set1, ok := getPool[A](e)
-	if !ok {
-		set1 = Init[A](e)
-	}
-
-	set2, ok := getPool[B](e)
-	if !ok {
-		set2 = Init[B](e)
-	}
+	set1 := initPool[A](e)
+	set2 := initPool[B](e)
 
 	*set1.Add(entityId) = a
 	*set2.Add(entityId) = b
 }
 
 func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
-	set1, ok := getPool[A](e)
-	if !ok {
-		set1 = Init[A](e)
-	}
-
-	set2, ok := getPool[B](e)
-	if !ok {
-		set2 = Init[B](e)
-	}
-
-	set3, ok := getPool[C](e)
-	if !ok {
-		set3 = Init[C](e)
-	}
+	set1 := initPool[A](e)
+	set2 := initPool[B](e)
+	set3 := initPool[C](e)
 
 	*set1.Add(entityId) = a
 	*set2.Add(entityId) = b
