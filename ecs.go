@@ -89,121 +89,120 @@ func Add[T any](e *ECS, entityId int) *T {
 }
 
 func Get[T any](e *ECS, entityId int) (*T, bool) {
-	set, ok := e.pools[getTypeId[T]()]
+	set, ok := getPool[T](e)
 	if !ok {
 		return nil, false
 	}
 
-	return (*sparseset.Set[T])(set).Get(entityId)
+	return set.Get(entityId)
 }
 
 func Get2[A, B any](e *ECS, entityId int) (*A, *B, bool) {
-	set1, ok := e.pools[getTypeId[A]()]
+	set1, ok := getPool[A](e)
 	if !ok {
 		return nil, nil, false
 	}
 
-	set2, ok := e.pools[getTypeId[B]()]
+	set2, ok := getPool[B](e)
 	if !ok {
 		return nil, nil, false
 	}
 
-	return sparseset.Lookup(entityId, (*sparseset.Set[A])(set1), (*sparseset.Set[B])(set2))
+	return sparseset.Lookup(entityId, set1, set2)
 }
 
 func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
-	set1, ok := e.pools[getTypeId[A]()]
+	set1, ok := getPool[A](e)
 	if !ok {
 		return nil, nil, nil, false
 	}
 
-	set2, ok := e.pools[getTypeId[B]()]
+	set2, ok := getPool[B](e)
 	if !ok {
 		return nil, nil, nil, false
 	}
 
-	set3, ok := e.pools[getTypeId[C]()]
+	set3, ok := getPool[C](e)
 	if !ok {
 		return nil, nil, nil, false
 	}
 
-	return sparseset.Lookup3(entityId, (*sparseset.Set[A])(set1), (*sparseset.Set[B])(set2), (*sparseset.Set[C])(set3))
+	return sparseset.Lookup3(entityId, set1, set2, set3)
 }
 
 func Remove[T any](e *ECS, entityId int) {
-	typeId := getTypeId[T]()
-	set, ok := e.pools[typeId]
+	set, ok := getPool[T](e)
 	if !ok {
 		return
 	}
 
-	(*sparseset.Set[T])(set).Remove(entityId)
+	set.Remove(entityId)
 }
 
 func Iterate[A any](e *ECS) *sparseset.Iterator[A] {
-	set, ok := e.pools[getTypeId[A]()]
+	set, ok := getPool[A](e)
 	if !ok {
 		return sparseset.EmptyIterator[A]()
 	}
 
-	return sparseset.Iterate((*sparseset.Set[A])(set))
+	return sparseset.Iterate(set)
 }
 
 func Join[A, B any](e *ECS) *sparseset.JoinIterator[A, B] {
-	a, ok := e.pools[getTypeId[A]()]
+	set1, ok := getPool[A](e)
 	if !ok {
 		return sparseset.EmptyJoinIterator[A, B]()
 	}
 
-	b, ok := e.pools[getTypeId[B]()]
+	set2, ok := getPool[B](e)
 	if !ok {
 		return sparseset.EmptyJoinIterator[A, B]()
 	}
 
-	return sparseset.Join((*sparseset.Set[A])(a), (*sparseset.Set[B])(b))
+	return sparseset.Join(set1, set2)
 }
 
 func Join3[A, B, C any](e *ECS) *sparseset.Join3Iterator[A, B, C] {
-	a, ok := e.pools[getTypeId[A]()]
+	set1, ok := getPool[A](e)
 	if !ok {
 		return sparseset.EmptyJoin3Iterator[A, B, C]()
 	}
 
-	b, ok := e.pools[getTypeId[B]()]
+	set2, ok := getPool[B](e)
 	if !ok {
 		return sparseset.EmptyJoin3Iterator[A, B, C]()
 	}
 
-	c, ok := e.pools[getTypeId[C]()]
+	set3, ok := getPool[C](e)
 	if !ok {
 		return sparseset.EmptyJoin3Iterator[A, B, C]()
 	}
 
-	return sparseset.Join3((*sparseset.Set[A])(a), (*sparseset.Set[B])(b), (*sparseset.Set[C])(c))
+	return sparseset.Join3(set1, set2, set3)
 }
 
 func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
-	a, ok := e.pools[getTypeId[A]()]
+	set1, ok := getPool[A](e)
 	if !ok {
 		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
 	}
 
-	b, ok := e.pools[getTypeId[B]()]
+	set2, ok := getPool[B](e)
 	if !ok {
 		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
 	}
 
-	c, ok := e.pools[getTypeId[C]()]
+	set3, ok := getPool[C](e)
 	if !ok {
 		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
 	}
 
-	d, ok := e.pools[getTypeId[D]()]
+	set4, ok := getPool[D](e)
 	if !ok {
 		return sparseset.EmptyJoin4Iterator[A, B, C, D]()
 	}
 
-	return sparseset.Join4((*sparseset.Set[A])(a), (*sparseset.Set[B])(b), (*sparseset.Set[C])(c), (*sparseset.Set[D])(d))
+	return sparseset.Join4(set1, set2, set3, set4)
 }
 
 func GetOne[T any](e *ECS) (int, *T, bool) {
@@ -219,10 +218,10 @@ func JoinOne[A, B any](e *ECS) (int, *A, *B, bool) {
 }
 
 func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) bool) {
-	set, ok := e.pools[getTypeId[T]()]
+	set, ok := getPool[T](e)
 	if !ok {
 		return
 	}
 
-	sparseset.SortStableFunc((*sparseset.Set[T])(set), compare)
+	sparseset.SortStableFunc(set, compare)
 }
