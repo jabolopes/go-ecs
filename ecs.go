@@ -76,6 +76,7 @@ func Init[T any](e *ECS) *sparseset.Set[T] {
 	return pool
 }
 
+// TODO: Use 'Set' instead.
 func Add[T any](e *ECS, entityId int) *T {
 	typeId := getTypeId[T]()
 	set, ok := e.pools[typeId]
