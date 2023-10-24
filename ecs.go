@@ -212,6 +212,12 @@ func GetOne[T any](e *ECS) (int, *T, bool) {
 	return entityId, t, ok
 }
 
+func JoinOne[A, B any](e *ECS) (int, *A, *B, bool) {
+	iterator := Join[A, B](e)
+	entityId, a, b, ok := iterator.Next()
+	return entityId, a, b, ok
+}
+
 func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) bool) {
 	set, ok := e.pools[getTypeId[T]()]
 	if !ok {
