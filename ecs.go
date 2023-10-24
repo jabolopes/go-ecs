@@ -206,6 +206,12 @@ func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
 	return sparseset.Join4((*sparseset.Set[A])(a), (*sparseset.Set[B])(b), (*sparseset.Set[C])(c), (*sparseset.Set[D])(d))
 }
 
+func GetOne[T any](e *ECS) (int, *T, bool) {
+	iterator := Iterate[T](e)
+	entityId, t, ok := iterator.Next()
+	return entityId, t, ok
+}
+
 func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) bool) {
 	set, ok := e.pools[getTypeId[T]()]
 	if !ok {
