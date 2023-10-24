@@ -33,6 +33,15 @@ type ECS struct {
 	pools           map[int]unsafe.Pointer
 }
 
+func getPool[T any](e *ECS) (*sparseset.Set[T], bool) {
+	set, ok := e.pools[getTypeId[T]()]
+	if !ok {
+		return nil, false
+	}
+
+	return (*sparseset.Set[T])(set), true
+}
+
 func New() *ECS {
 	return &ECS{
 		4096,                     /* defaultPageSize */
@@ -42,7 +51,7 @@ func New() *ECS {
 }
 
 func Init[T any](e *ECS) *sparseset.Set[T] {
-	if p, ok := GetPool[T](e); ok {
+	if p, ok := getPool[T](e); ok {
 		return p
 	}
 
@@ -129,15 +138,6 @@ func Remove[T any](e *ECS, entityId int) {
 	}
 
 	(*sparseset.Set[T])(set).Remove(entityId)
-}
-
-func GetPool[T any](e *ECS) (*sparseset.Set[T], bool) {
-	set, ok := e.pools[getTypeId[T]()]
-	if !ok {
-		return nil, false
-	}
-
-	return (*sparseset.Set[T])(set), true
 }
 
 func Iterate[A any](e *ECS) *sparseset.Iterator[A] {
