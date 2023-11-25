@@ -241,7 +241,7 @@ func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
 	return sparseset.Join4(set1, set2, set3, set4)
 }
 
-func GetOne[T any](e *ECS) (int, *T, bool) {
+func IterateOne[T any](e *ECS) (int, *T, bool) {
 	iterator := Iterate[T](e)
 	entityId, t, ok := iterator.Next()
 	return entityId, t, ok
