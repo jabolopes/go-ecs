@@ -30,7 +30,16 @@ type remover interface {
 	Remove(int)
 }
 
-// TODO: Replace pools map with array.
+// ECS is the Entity Component System.
+//
+// Several functions / methods return pointers to components. These pointers are
+// only valid as long as the ECS is not modified by adding or removing
+// entities. If adding or removing entities, the ECS's internal memory may
+// reallocated, thus invaliding those pointers. For this reason, pointers to
+// components obtained prior to adding or removing entities should not be
+// accessed if the ECS is modified in this way. Also, it's recommended not to
+// store pointers to components inside data types for later use because if they
+// become invalidated it's easy to forget and access them later.
 type ECS struct {
 	defaultPageSize int
 	nullKey         int
@@ -75,18 +84,21 @@ func initPool[T any](e *ECS) *sparseset.Set[T] {
 	return pool
 }
 
+// Creates a new entity and returns the entity ID.
 func (e *ECS) Add() int {
 	id := e.idGenerator
 	e.idGenerator++
 	return id
 }
 
+// Removes an entity given its ID and removes all of its components.
 func (e *ECS) Remove(entityId int) {
 	for _, remover := range e.removers {
 		remover.Remove(entityId)
 	}
 }
 
+// Returns a new instance of the ECS with default options.
 func New() *ECS {
 	return &ECS{
 		4096,                     /* defaultPageSize */
@@ -97,11 +109,22 @@ func New() *ECS {
 	}
 }
 
-// TODO: Use 'Set' instead.
+// Add a component to an entity and return a pointer to it.
+//
+// If the entity already has a component with the given type, a pointer is
+// returned to it. The component is not modified in this case.
+//
+// The pointer is valid as long as the ECS is not modified (see ECS type). If in
+// doubt, prefer to use of the 'Set*' functions instead.
 func Add[T any](e *ECS, entityId int) *T {
 	return initPool[T](e).Add(entityId)
 }
 
+// Returns a component of the given type for an entity given its ID. Returns a
+// pointer to the component and true if said entity exists, otherwise it returns
+// false.
+//
+// The pointer is valid as long as the ECS is not modified (see ECS type)
 func Get[T any](e *ECS, entityId int) (*T, bool) {
 	set, ok := getPool[T](e)
 	if !ok {
@@ -111,6 +134,10 @@ func Get[T any](e *ECS, entityId int) (*T, bool) {
 	return set.Get(entityId)
 }
 
+// Same as 'Get' for 2 component types. Returns true only if the entity has all
+// types.
+//
+// The pointers are valid as long as the ECS is not modified (see ECS type)
 func Get2[A, B any](e *ECS, entityId int) (*A, *B, bool) {
 	set1, ok := getPool[A](e)
 	if !ok {
@@ -125,6 +152,10 @@ func Get2[A, B any](e *ECS, entityId int) (*A, *B, bool) {
 	return sparseset.Lookup(entityId, set1, set2)
 }
 
+// Same as 'Get' for 3 component types. Returns true only if the entity has all
+// types.
+//
+// The pointers are valid as long as the ECS is not modified (see ECS type)
 func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
 	set1, ok := getPool[A](e)
 	if !ok {
@@ -144,10 +175,12 @@ func Get3[A, B, C any](e *ECS, entityId int) (*A, *B, *C, bool) {
 	return sparseset.Lookup3(entityId, set1, set2, set3)
 }
 
+// Sets a component for an entity given its ID.
 func Set[A any](e *ECS, entityId int, a A) {
 	*initPool[A](e).Add(entityId) = a
 }
 
+// Same as 'Set' for 2 component types.
 func Set2[A, B any](e *ECS, entityId int, a A, b B) {
 	set1 := initPool[A](e)
 	set2 := initPool[B](e)
@@ -156,6 +189,7 @@ func Set2[A, B any](e *ECS, entityId int, a A, b B) {
 	*set2.Add(entityId) = b
 }
 
+// Same as 'Set' for 3 component types.
 func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
 	set1 := initPool[A](e)
 	set2 := initPool[B](e)
@@ -166,6 +200,8 @@ func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
 	*set3.Add(entityId) = c
 }
 
+// Removes a component from an entity given its ID. If the entity already does
+// not have said component, then it's a no-op.
 func Unset[T any](e *ECS, entityId int) {
 	set, ok := getPool[T](e)
 	if !ok {
@@ -175,6 +211,20 @@ func Unset[T any](e *ECS, entityId int) {
 	set.Remove(entityId)
 }
 
+// Returns an iterator that iterates all entities that have the given component
+// type.
+//
+// for iterator := ecs.Iterate[MyComponent](e); ; {
+//   c, ok := e.Next()
+//   if !ok {
+//     break
+//   }
+//
+//   // Do something with 'c'.
+// }
+//
+// The pointer returned by the iterator is valid as long as the ECS is not
+// modified (see ECS type)
 func Iterate[A any](e *ECS) *sparseset.Iterator[A] {
 	set, ok := getPool[A](e)
 	if !ok {
@@ -184,6 +234,19 @@ func Iterate[A any](e *ECS) *sparseset.Iterator[A] {
 	return sparseset.Iterate(set)
 }
 
+// Returns an iterator that iterates all entities that have all component types.
+//
+// for iterator := ecs.Join[MyComponent, OtherComponent](e); ; {
+//   c1, c2, ok := e.Next()
+//   if !ok {
+//     break
+//   }
+//
+//   // Do something with 'c1' and 'c2'.
+// }
+//
+// The pointers returned by the iterator are valid as long as the ECS is not
+// modified (see ECS type)
 func Join[A, B any](e *ECS) *sparseset.JoinIterator[A, B] {
 	set1, ok := getPool[A](e)
 	if !ok {
@@ -198,6 +261,7 @@ func Join[A, B any](e *ECS) *sparseset.JoinIterator[A, B] {
 	return sparseset.Join(set1, set2)
 }
 
+// Same as 'Join' for 3 component types.
 func Join3[A, B, C any](e *ECS) *sparseset.Join3Iterator[A, B, C] {
 	set1, ok := getPool[A](e)
 	if !ok {
@@ -217,6 +281,7 @@ func Join3[A, B, C any](e *ECS) *sparseset.Join3Iterator[A, B, C] {
 	return sparseset.Join3(set1, set2, set3)
 }
 
+// Same as 'Join' for 4 component types.
 func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
 	set1, ok := getPool[A](e)
 	if !ok {
@@ -241,18 +306,31 @@ func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
 	return sparseset.Join4(set1, set2, set3, set4)
 }
 
+// Returns any entity that has the given component. Returns the entity ID, the
+// pointer to the component and true if said entity exists, otherwise it returns
+// false.
+//
+// The pointer is valid as long as the ECS is not modified (see ECS type)
 func IterateOne[T any](e *ECS) (int, *T, bool) {
 	iterator := Iterate[T](e)
 	entityId, t, ok := iterator.Next()
 	return entityId, t, ok
 }
 
+// Returns any entity that has all the given components. Returns the entity ID,
+// the pointers to the components and true if said entitiy exists, otherwise it
+// returns false. The pointers are valid as long as the ECS is not modified.
+//
+// The pointers are valid as long as the ECS is not modified (see ECS type)
 func JoinOne[A, B any](e *ECS) (int, *A, *B, bool) {
 	iterator := Join[A, B](e)
 	entityId, a, b, ok := iterator.Next()
 	return entityId, a, b, ok
 }
 
+// Sorts the components using a stable sort function according to the given
+// comparator function. The comparator function uses the same semantics are
+// 'cmp.Compare' from the http://pkg.go.dev/cmp package.
 func SortStableFunc[T any](e *ECS, compare func(int, *T, int, *T) int) {
 	set, ok := getPool[T](e)
 	if !ok {
