@@ -109,15 +109,12 @@ func New() *ECS {
 	}
 }
 
-// Add a component to an entity and return a pointer to it.
-//
-// If the entity already has a component with the given type, a pointer is
-// returned to it. The component is not modified in this case.
-//
-// The pointer is valid as long as the ECS is not modified (see ECS type). If in
-// doubt, prefer to use of the 'Set*' functions instead.
-func Add[T any](e *ECS, entityId int) *T {
-	return initPool[T](e).Add(entityId)
+// Initializes an entity and its component. If the entity already exists, it is
+// first removed and then re-added. If the intention is not to initialize the
+// entity, then use 'Set' instead.
+func Init[A any](e *ECS, entityId int, a A) {
+	e.Remove(entityId)
+	*initPool[A](e).Add(entityId) = a
 }
 
 // Returns a component of the given type for an entity given its ID. Returns a

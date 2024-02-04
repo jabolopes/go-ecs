@@ -16,9 +16,6 @@ entity := e.Add()
 e.Delete(entity)
 
 // Set component in entity.
-component := ecs.Add[MyComponent](e, entityId)
-component.field = value
-
 ecs.Set(e, MyComponent{value})
 ecs.Set2(e, MyComponent{value1}, OtherComponent{value2})
 
