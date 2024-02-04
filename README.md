@@ -54,8 +54,8 @@ for it := ecs.Join[MyComponent, OtherComponent](e); ; {
 for it := ecs.Join3[MyC1, MyC2, MyC3](e) ; ; { ... }
 
 // Get singleton entity with given component.
-entityID, c, ok := e.IterateOne[MyComponent](e)
+entityID, c, ok := e.IterateAny[MyComponent](e)
 
 // Get singleton entity with both components.
-entityID, c1, c2, ok := e.JoinOne[MyComponent, OtherComponents](e)
+entityID, c1, c2, ok := e.JoinAny[MyComponent, OtherComponents](e)
 ```

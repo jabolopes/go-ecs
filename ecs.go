@@ -311,7 +311,7 @@ func Join4[A, B, C, D any](e *ECS) *sparseset.Join4Iterator[A, B, C, D] {
 // false.
 //
 // The pointer is valid as long as the ECS is not modified (see ECS type)
-func IterateOne[T any](e *ECS) (int, *T, bool) {
+func IterateAny[T any](e *ECS) (int, *T, bool) {
 	iterator := Iterate[T](e)
 	entityId, t, ok := iterator.Next()
 	return entityId, t, ok
@@ -322,7 +322,7 @@ func IterateOne[T any](e *ECS) (int, *T, bool) {
 // returns false. The pointers are valid as long as the ECS is not modified.
 //
 // The pointers are valid as long as the ECS is not modified (see ECS type)
-func JoinOne[A, B any](e *ECS) (int, *A, *B, bool) {
+func JoinAny[A, B any](e *ECS) (int, *A, *B, bool) {
 	iterator := Join[A, B](e)
 	entityId, a, b, ok := iterator.Next()
 	return entityId, a, b, ok
