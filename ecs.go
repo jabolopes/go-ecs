@@ -117,6 +117,26 @@ func Init[A any](e *ECS, entityId int, a A) {
 	*initPool[A](e).Add(entityId) = a
 }
 
+func Init2[A, B any](e *ECS, entityId int, a A, b B) {
+	e.Remove(entityId)
+	Set2(e, entityId, a, b)
+}
+
+func Init3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
+	e.Remove(entityId)
+	Set3(e, entityId, a, b, c)
+}
+
+func Init4[A, B, C, D any](e *ECS, entityId int, a A, b B, c C, d D) {
+	e.Remove(entityId)
+	Set4(e, entityId, a, b, c, d)
+}
+
+func Init5[A, B, C, D, E any](ecs *ECS, entityId int, a A, b B, c C, d D, e E) {
+	ecs.Remove(entityId)
+	Set5(ecs, entityId, a, b, c, d, e)
+}
+
 // Returns a component of the given type for an entity given its ID. Returns a
 // pointer to the component and true if said entity exists, otherwise it returns
 // false.
@@ -195,6 +215,34 @@ func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
 	*set1.Add(entityId) = a
 	*set2.Add(entityId) = b
 	*set3.Add(entityId) = c
+}
+
+// Same as 'Set' for 4 component types.
+func Set4[A, B, C, D any](e *ECS, entityId int, a A, b B, c C, d D) {
+	set1 := initPool[A](e)
+	set2 := initPool[B](e)
+	set3 := initPool[C](e)
+	set4 := initPool[D](e)
+
+	*set1.Add(entityId) = a
+	*set2.Add(entityId) = b
+	*set3.Add(entityId) = c
+	*set4.Add(entityId) = d
+}
+
+// Same as 'Set' for 5 component types.
+func Set5[A, B, C, D, E any](ecs *ECS, entityId int, a A, b B, c C, d D, e E) {
+	set1 := initPool[A](ecs)
+	set2 := initPool[B](ecs)
+	set3 := initPool[C](ecs)
+	set4 := initPool[D](ecs)
+	set5 := initPool[E](ecs)
+
+	*set1.Add(entityId) = a
+	*set2.Add(entityId) = b
+	*set3.Add(entityId) = c
+	*set4.Add(entityId) = d
+	*set5.Add(entityId) = e
 }
 
 // Removes a component from an entity given its ID. If the entity already does
@@ -323,6 +371,12 @@ func JoinAny[A, B any](e *ECS) (int, *A, *B, bool) {
 	iterator := Join[A, B](e)
 	entityId, a, b, ok := iterator.Next()
 	return entityId, a, b, ok
+}
+
+func Join3Any[A, B, C any](e *ECS) (int, *A, *B, *C, bool) {
+	iterator := Join3[A, B, C](e)
+	entityId, a, b, c, ok := iterator.Next()
+	return entityId, a, b, c, ok
 }
 
 // Sorts the components using a stable sort function according to the given
