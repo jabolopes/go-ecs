@@ -2,7 +2,7 @@ github.com/bxcodec/faker/v3 v3.8.0 h1:F59Qqnsh0BOtZRC+c4cXoB/VNYDMS3R5mlSpxIap1o
 github.com/bxcodec/faker/v3 v3.8.0/go.mod h1:gF31YgnMSMKgkvl+fyEo1xuSMbEuieyqfeslGYFjneM=
 github.com/jabolopes/go-maths v0.0.0-20220325190439-76acb00fc555 h1:VKyb1kp5ywPnuqUMECtPWUPOclAcsUydJqqSLbl2k/U=
 github.com/jabolopes/go-maths v0.0.0-20220325190439-76acb00fc555/go.mod h1:QaUBs9nWB5n08epeVrOdtawFNDCZXxMKEP0mITI03vg=
-github.com/jabolopes/go-sparseset v0.0.0-20231024203056-0cbd70175ec9 h1:WwJ/c5SpnVrmbRCf3ZVVQNmbYnQ6XUgWbXLt+3CHQQc=
-github.com/jabolopes/go-sparseset v0.0.0-20231024203056-0cbd70175ec9/go.mod h1:wU3urxDEAjZkXGNlHXUsbDyclWDPn7EMjZWHyeWJaqA=
-golang.org/x/exp v0.0.0-20231006140011-7918f672742d h1:jtJma62tbqLibJ5sFQz8bKtEM8rJBtfilJ2qTU199MI=
-golang.org/x/exp v0.0.0-20231006140011-7918f672742d/go.mod h1:ldy0pHrwJyGW56pPQzzkH36rKxoZW1tw7ZJpeKx+hdo=
+github.com/jabolopes/go-sparseset v0.0.0-20240729185445-76be5559995b h1:DyVoZGSkG+pj8vqyDrzR35lb1n1TF98y7lyDZXWGdXc=
+github.com/jabolopes/go-sparseset v0.0.0-20240729185445-76be5559995b/go.mod h1:kYf8k1tMgV157bG3VI7dm7ZSrZmE+KKXyD/6wPC8Jcc=
+golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 h1:2dVuKD2vS7b0QIHQbpyTISPd0LeHDbnYEryqj5Q1ug8=
+golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56/go.mod h1:M4RDyNAINzryxdtnbRXRL/OHtkFuWGRjvuhBJpk2IlY=
