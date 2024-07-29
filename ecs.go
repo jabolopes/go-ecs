@@ -137,6 +137,21 @@ func Init5[A, B, C, D, E any](ecs *ECS, entityId int, a A, b B, c C, d D, e E) {
 	Set5(ecs, entityId, a, b, c, d, e)
 }
 
+func Init6[A, B, C, D, E, F any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F) {
+	ecs.Remove(entityId)
+	Set6(ecs, entityId, a, b, c, d, e, f)
+}
+
+func Init7[A, B, C, D, E, F, G any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F, g G) {
+	ecs.Remove(entityId)
+	Set7(ecs, entityId, a, b, c, d, e, f, g)
+}
+
+func Init8[A, B, C, D, E, F, G, H any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F, g G, h H) {
+	ecs.Remove(entityId)
+	Set8(ecs, entityId, a, b, c, d, e, f, g, h)
+}
+
 // Returns a component of the given type for an entity given its ID. Returns a
 // pointer to the component and true if said entity exists, otherwise it returns
 // false.
@@ -198,51 +213,66 @@ func Set[A any](e *ECS, entityId int, a A) {
 }
 
 // Same as 'Set' for 2 component types.
-func Set2[A, B any](e *ECS, entityId int, a A, b B) {
-	set1 := initPool[A](e)
-	set2 := initPool[B](e)
-
-	*set1.Add(entityId) = a
-	*set2.Add(entityId) = b
+func Set2[A, B any](ecs *ECS, entityId int, a A, b B) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
 }
 
 // Same as 'Set' for 3 component types.
-func Set3[A, B, C any](e *ECS, entityId int, a A, b B, c C) {
-	set1 := initPool[A](e)
-	set2 := initPool[B](e)
-	set3 := initPool[C](e)
-
-	*set1.Add(entityId) = a
-	*set2.Add(entityId) = b
-	*set3.Add(entityId) = c
+func Set3[A, B, C any](ecs *ECS, entityId int, a A, b B, c C) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
 }
 
 // Same as 'Set' for 4 component types.
-func Set4[A, B, C, D any](e *ECS, entityId int, a A, b B, c C, d D) {
-	set1 := initPool[A](e)
-	set2 := initPool[B](e)
-	set3 := initPool[C](e)
-	set4 := initPool[D](e)
-
-	*set1.Add(entityId) = a
-	*set2.Add(entityId) = b
-	*set3.Add(entityId) = c
-	*set4.Add(entityId) = d
+func Set4[A, B, C, D any](ecs *ECS, entityId int, a A, b B, c C, d D) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
+	*initPool[D](ecs).Add(entityId) = d
 }
 
 // Same as 'Set' for 5 component types.
 func Set5[A, B, C, D, E any](ecs *ECS, entityId int, a A, b B, c C, d D, e E) {
-	set1 := initPool[A](ecs)
-	set2 := initPool[B](ecs)
-	set3 := initPool[C](ecs)
-	set4 := initPool[D](ecs)
-	set5 := initPool[E](ecs)
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
+	*initPool[D](ecs).Add(entityId) = d
+	*initPool[E](ecs).Add(entityId) = e
+}
 
-	*set1.Add(entityId) = a
-	*set2.Add(entityId) = b
-	*set3.Add(entityId) = c
-	*set4.Add(entityId) = d
-	*set5.Add(entityId) = e
+// Same as 'Set' for 6 component types.
+func Set6[A, B, C, D, E, F any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
+	*initPool[D](ecs).Add(entityId) = d
+	*initPool[E](ecs).Add(entityId) = e
+	*initPool[F](ecs).Add(entityId) = f
+}
+
+// Same as 'Set' for 7 component types.
+func Set7[A, B, C, D, E, F, G any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F, g G) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
+	*initPool[D](ecs).Add(entityId) = d
+	*initPool[E](ecs).Add(entityId) = e
+	*initPool[F](ecs).Add(entityId) = f
+	*initPool[G](ecs).Add(entityId) = g
+}
+
+// Same as 'Set' for 8 component types.
+func Set8[A, B, C, D, E, F, G, H any](ecs *ECS, entityId int, a A, b B, c C, d D, e E, f F, g G, h H) {
+	*initPool[A](ecs).Add(entityId) = a
+	*initPool[B](ecs).Add(entityId) = b
+	*initPool[C](ecs).Add(entityId) = c
+	*initPool[D](ecs).Add(entityId) = d
+	*initPool[E](ecs).Add(entityId) = e
+	*initPool[F](ecs).Add(entityId) = f
+	*initPool[G](ecs).Add(entityId) = g
+	*initPool[H](ecs).Add(entityId) = h
 }
 
 // Removes a component from an entity given its ID. If the entity already does
